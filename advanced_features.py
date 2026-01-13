@@ -26,10 +26,51 @@ class AdvancedPortfolioOptimizer(PortfolioOptimizer):
     Extended optimizer with ML and advanced risk measures
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.lstm_model = None
-        self.volatility_scaler = MinMaxScaler()
+    def __init__(self, tickers, start_date, end_date):
+        """
+        Initialize portfolio optimizer with market data
+        """
+        # Handle both list and comma-separated string
+        if isinstance(tickers, str):
+            self.tickers = [t.strip() for t in tickers.split(',') if t.strip()]
+        else:
+            self.tickers = [t for t in tickers if t]
+
+        if not self.tickers:
+            raise ValueError("No valid tickers provided")
+
+        self.start_date = start_date
+        self.end_date = end_date
+
+        # Download data
+        try:
+            raw_data = yf.download(self.tickers, start=start_date, end=end_date, progress=False)
+
+            # Handle both single and multiple tickers
+            if len(self.tickers) == 1:
+                self.data = pd.DataFrame(raw_data['Adj Close'])
+                self.data.columns = self.tickers
+            else:
+                if isinstance(raw_data.columns, pd.MultiIndex):
+                    self.data = raw_data['Adj Close']
+                else:
+                    self.data = raw_data
+
+            # Validate data
+            if self.data.empty:
+                raise ValueError(f"No data downloaded for {self.tickers}")
+
+            # Drop NaN values
+            self.data = self.data.dropna()
+
+            if self.data.empty:
+                raise ValueError("No valid data after cleaning")
+
+            # Calculate returns
+            self.returns = self.data.pct_change().dropna()
+
+        except Exception as e:
+            raise ValueError(f"Error downloading data: {str(e)}")
 
     def train_lstm_volatility(self, lookback=60, epochs=50):
         """

@@ -51,14 +51,43 @@ class PortfolioOptimizer:
         self.mean_returns = self.returns.mean() * 252
 
     def _download_data(self):
-        """Download historical price data"""
-        data = yf.download(self.tickers, start=self.start_date,
-                           end=self.end_date, progress=False)
-        if len(self.tickers) == 1:
-            prices = data['Adj Close'].to_frame()
-            prices.columns = self.tickers
+        """Download historical data from Yahoo Finance"""
+        import pandas as pd
+
+        print(f"Downloading data for {self.tickers}...")
+        data = yf.download(self.tickers, start=self.start_date, end=self.end_date, progress=False)
+
+        # Extract Close prices (which are already adjusted in newer yfinance)
+        if isinstance(data.columns, pd.MultiIndex):
+            # MultiIndex case (multiple tickers or yfinance structure)
+            if 'Close' in data.columns.get_level_values(0):
+                prices = data['Close']
+            elif 'Adj Close' in data.columns.get_level_values(0):
+                prices = data['Adj Close']
+            else:
+                raise ValueError("Cannot find 'Close' or 'Adj Close' in data")
         else:
-            prices = data['Adj Close']
+            # Simple case (single ticker, older yfinance)
+            if 'Close' in data.columns:
+                prices = data[['Close']].copy()
+                prices.columns = self.tickers
+            elif 'Adj Close' in data.columns:
+                prices = data[['Adj Close']].copy()
+                prices.columns = self.tickers
+            else:
+                prices = data
+
+        # Validate data
+        if prices.empty:
+            raise ValueError(f"No data downloaded for {self.tickers}. Check ticker symbols and date range.")
+
+        # Remove NaN values
+        prices = prices.dropna()
+
+        if prices.empty:
+            raise ValueError("All data contains NaN values. Check ticker symbols.")
+
+        print(f"✅ Successfully downloaded {len(prices)} rows for {list(prices.columns)}")
         return prices
 
     def _ledoit_wolf_cov(self):
