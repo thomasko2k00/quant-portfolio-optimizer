@@ -26,12 +26,13 @@ Advanced mean-variance portfolio optimization with Ledoit-Wolf shrinkage, Black-
 git clone https://github.com/thomasko2k00/quant-portfolio-optimizer.git
 cd quant-portfolio-optimizer
 
-Step 2: Deactivate Conda (If Using Anaconda)
-bash
+### Step 2: Deactivate Conda (If Using Anaconda)
+```bash
 # If you have Anaconda/Conda installed, deactivate it first
 conda deactivate
-Step 3: Create Virtual Environment
-bash
+
+### Step 3: Create Virtual Environment
+```bash
 # Use Python 3.10 or higher
 python3 -m venv .venv
 
@@ -39,11 +40,13 @@ python3 -m venv .venv
 source .venv/bin/activate  # Mac/Linux
 # OR
 .venv\Scripts\activate     # Windows
-Step 4: Verify Python Version
-bash
+
+### Step 4: Verify Python Version
+```bash
 python --version  # Should show 3.10+ or higher
-Step 5: Install Dependencies
-bash
+
+### Step 5: Install Dependencies
+```bash
 # Upgrade pip first
 pip install --upgrade pip
 
@@ -57,15 +60,15 @@ pip install ecos
 pip install -r requirements.txt
 Running the Dashboard
 Interactive Streamlit Dashboard
-bash
+```bash
 streamlit run streamlit_app.py
 Browser will open automatically at http://localhost:8501
 
 Basic Optimizer (Command Line)
-bash
+```bash
 python portfolio_optimizer.py
 Run Tests
-bash
+```bash
 python tests/test_validation.py
 Troubleshooting
 Error: KeyError: 'Adj Close'
@@ -74,7 +77,7 @@ Solution: Make sure you're using the latest code. The _download_data() method ha
 Error: The solver ECOS is not installed
 Solution:
 
-bash
+```bash
 pip install ecos
 Error: name 'px' is not defined
 Solution: Make sure streamlit_app.py has this import:
@@ -84,7 +87,7 @@ import plotly.express as px
 Error: Type hint issues (unsupported operand type(s) for |)
 Solution: You're using Python 3.9 or lower. Upgrade to Python 3.10+:
 
-bash
+```bash
 # Remove old virtual environment
 rm -rf .venv
 
@@ -95,7 +98,7 @@ pip install -r requirements.txt
 Conda Conflicts
 If you see both (.venv) and (base) in your terminal prompt:
 
-bash
+```bash
 # Deactivate Conda first
 conda deactivate
 
