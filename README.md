@@ -17,7 +17,7 @@ Advanced mean-variance portfolio optimization with Ledoit-Wolf shrinkage, Black-
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/quant-portfolio-optimizer.git
+git clone https://github.com/thomasko2k00/quant-portfolio-optimizer.git
 cd quant-portfolio-optimizer
 
 # Create virtual environment
@@ -28,3 +28,24 @@ venv\Scripts\activate  # Windows
 
 # Install dependencies
 pip install -r requirements.txt
+
+## Quick Start
+
+```python
+from portfolio_optimizer import PortfolioOptimizer
+import numpy as np
+
+# Optimize portfolio
+tickers = ['SPY', 'AAPL', 'TSLA']
+optimizer = PortfolioOptimizer(tickers, '2021-01-01', '2024-12-31')
+
+# Traditional mean-variance
+weights = optimizer.optimize()
+print(weights)
+
+# Black-Litterman with views
+P = np.array([[-1, 1, 0], ])[1]
+Q = np.array([0.05, 0.10])
+bl_returns, _ = optimizer.black_litterman(P, Q)
+bl_weights = optimizer.optimize(expected_returns=bl_returns)
+print(bl_weights)
